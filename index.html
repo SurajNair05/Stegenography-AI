@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StegoAI — Hide Messages in AI Images</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <script src="https://js.puter.com/v2/"></script>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="2" y="2" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.5" />
+            <circle cx="11" cy="11" r="3" fill="currentColor" />
+            <path d="M11 2v3M11 17v3M2 11h3M17 11h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+        </div>
+        <span class="brand-name">StegoAI</span>
+      </div>
+      <div class="nav-badge">Cryptography Project</div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-tag">LSB Steganography + XOR Encryption</div>
+      <h1 class="hero-title">Hide secrets inside<br><span class="hero-accent">AI-generated images</span></h1>
+      <p class="hero-sub">Embed encrypted messages invisibly into pixels. No one will know the image carries a secret —
+        except the person with the key.</p>
+    </div>
+  </header>
+
+  <!-- MAIN APP -->
+  <main class="app-wrapper">
+
+    <!-- TAB BAR -->
+    <div class="tab-bar" role="tablist">
+      <button class="tab active" id="tab-encode" role="tab" aria-selected="true" aria-controls="panel-encode"
+        onclick="switchTab('encode')">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="14" height="14" rx="3" stroke="currentColor" stroke-width="1.4" />
+          <path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        Encode — Hide Message
+      </button>
+      <button class="tab" id="tab-decode" role="tab" aria-selected="false" aria-controls="panel-decode"
+        onclick="switchTab('decode')">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="14" height="14" rx="3" stroke="currentColor" stroke-width="1.4" />
+          <path d="M5 8h6M9 6l2 2-2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        Decode — Reveal Message
+      </button>
+      <button class="tab tab-ai" id="tab-aigenerate" role="tab" aria-selected="false" aria-controls="panel-aigenerate"
+        onclick="switchTab('aigenerate')">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4" />
+          <path
+            d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"
+            stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+        </svg>
+        AI Generate &amp; Encode
+      </button>
+      <button class="tab tab-sss" id="tab-shamirs" role="tab" aria-selected="false" aria-controls="panel-shamirs"
+        onclick="switchTab('shamirs')">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="4" cy="8" r="2" stroke="currentColor" stroke-width="1.4" />
+          <circle cx="12" cy="4" r="2" stroke="currentColor" stroke-width="1.4" />
+          <circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="1.4" />
+          <path d="M6 7.5l4-2.5M6 8.5l4 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+        </svg>
+        Shamir's Secret Sharing
+      </button>
+    </div>
+
+    <!-- ENCODE PANEL -->
+    <div class="panel active" id="panel-encode" role="tabpanel" aria-labelledby="tab-encode">
+      <div class="panel-grid">
+
+        <!-- Left: Image upload -->
+        <div class="panel-col">
+          <div class="section-label">1. Upload AI-generated image</div>
+          <div class="upload-zone" id="encode-zone" tabindex="0" role="button" aria-label="Upload image for encoding"
+            onclick="document.getElementById('encode-file').click()" ondragover="handleDragOver(event)"
+            ondrop="handleDrop(event, 'encode')"
+            onkeydown="if(event.key==='Enter'||event.key===' ')document.getElementById('encode-file').click()">
+            <div class="upload-content" id="encode-upload-content">
+              <div class="upload-icon">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                  <path d="M16 20V10M16 10l-4 4M16 10l4 4" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M8 24h16M4 16a12 12 0 1 1 24 0" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" />
+                </svg>
+              </div>
+              <div class="upload-text">Drop image here or click to browse</div>
+              <div class="upload-hint">PNG · JPG · WEBP · Any size</div>
+            </div>
+            <img id="encode-preview" class="upload-preview hidden" alt="Uploaded image preview" />
+          </div>
+          <input type="file" id="encode-file" accept="image/*" hidden onchange="handleEncodeImageUpload(event)" />
+          <div class="image-meta hidden" id="encode-meta">
+            <span id="encode-meta-name"></span>
+            <span id="encode-meta-size"></span>
+            <button class="meta-change" onclick="document.getElementById('encode-file').click()">Change</button>
+          </div>
+        </div>
+
+        <!-- Right: Message + password + action -->
+        <div class="panel-col">
+          <div class="section-label">2. Enter your secret message</div>
+          <div class="field-group">
+            <textarea id="secret-message" class="textarea" placeholder="Type your secret message here..." rows="5"
+              oninput="updateCapacity()"></textarea>
+            <div class="capacity-row">
+              <div class="capacity-bar-wrap">
+                <div class="capacity-bar-fill" id="capacity-fill" style="width:0%"></div>
+              </div>
+              <span class="capacity-label" id="capacity-label">Upload an image to see capacity</span>
+            </div>
+          </div>
+
+          <div class="section-label" style="margin-top:1.5rem">3. Password (optional)</div>
+          <div class="field-group">
+            <div class="password-field">
+              <input type="password" id="encode-password" class="input"
+                placeholder="Add a password for extra security" />
+              <button class="eye-btn" onclick="togglePassword('encode-password', this)" aria-label="Show/hide password">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.3" />
+                  <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3" />
+                </svg>
+              </button>
+            </div>
+            <p class="field-hint">If set, your message will be XOR-encrypted before hiding. The receiver needs this same
+              password to decode.</p>
+          </div>
+
+          <button class="btn-primary" id="encode-btn" onclick="encodeMessage()" disabled>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="2" y="7" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.3" />
+              <path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+            </svg>
+            Encode &amp; Download Image
+          </button>
+
+          <!-- Status messages -->
+          <div class="status hidden" id="encode-status" role="alert"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DECODE PANEL -->
+    <div class="panel hidden" id="panel-decode" role="tabpanel" aria-labelledby="tab-decode">
+      <div class="panel-grid">
+
+        <!-- Left: Image upload -->
+        <div class="panel-col">
+          <div class="section-label">1. Upload the encoded image</div>
+          <div class="upload-zone" id="decode-zone" tabindex="0" role="button" aria-label="Upload image for decoding"
+            onclick="document.getElementById('decode-file').click()" ondragover="handleDragOver(event)"
+            ondrop="handleDrop(event, 'decode')"
+            onkeydown="if(event.key==='Enter'||event.key===' ')document.getElementById('decode-file').click()">
+            <div class="upload-content" id="decode-upload-content">
+              <div class="upload-icon">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                  <path d="M16 12v10M16 22l-4-4M16 22l4-4" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M8 24h16M4 16a12 12 0 1 1 24 0" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" />
+                </svg>
+              </div>
+              <div class="upload-text">Drop encoded image here or click to browse</div>
+              <div class="upload-hint">Must be the exact PNG downloaded after encoding</div>
+            </div>
+            <img id="decode-preview" class="upload-preview hidden" alt="Uploaded image preview" />
+          </div>
+          <input type="file" id="decode-file" accept="image/*" hidden onchange="handleDecodeImageUpload(event)" />
+          <div class="image-meta hidden" id="decode-meta">
+            <span id="decode-meta-name"></span>
+            <span id="decode-meta-size"></span>
+            <button class="meta-change" onclick="document.getElementById('decode-file').click()">Change</button>
+          </div>
+        </div>
+
+        <!-- Right: Password + action + result -->
+        <div class="panel-col">
+          <div class="section-label">2. Enter password (if one was used)</div>
+          <div class="field-group">
+            <div class="password-field">
+              <input type="password" id="decode-password" class="input"
+                placeholder="Leave blank if no password was set" />
+              <button class="eye-btn" onclick="togglePassword('decode-password', this)" aria-label="Show/hide password">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.3" />
+                  <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="decode-btn" onclick="decodeMessage()" disabled style="margin-top:1.5rem">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="2" y="7" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.3" />
+              <path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+              <path d="M8 11v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+            </svg>
+            Decode Hidden Message
+          </button>
+
+          <!-- Status -->
+          <div class="status hidden" id="decode-status" role="alert"></div>
+
+          <!-- Result box -->
+          <div class="result-box hidden" id="result-box">
+            <div class="result-header">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M7 1l1.5 3 3.5.5-2.5 2.5.5 3.5L7 9l-3 1.5.5-3.5L2 4.5 5.5 4z" stroke="currentColor"
+                  stroke-width="1.2" stroke-linejoin="round" />
+              </svg>
+              Hidden message revealed
+            </div>
+            <div class="result-text" id="result-text"></div>
+            <button class="copy-btn" onclick="copyResult()" id="copy-btn">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2" />
+                <path d="M4 9H2.5A1.5 1.5 0 0 1 1 7.5V2.5A1.5 1.5 0 0 1 2.5 1h5A1.5 1.5 0 0 1 9 2.5V4"
+                  stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+              </svg>
+              Copy message
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- AI GENERATE PANEL -->
+    <div class="panel hidden" id="panel-aigenerate" role="tabpanel" aria-labelledby="tab-aigenerate">
+      <div class="ai-generate-grid">
+
+        <!-- Left col: inputs -->
+        <div class="panel-col">
+          <div class="section-label">1. Describe the image you want AI to generate</div>
+          <div class="field-group">
+            <textarea id="ai-prompt" class="textarea"
+              placeholder="e.g. a futuristic neon city at night, cyberpunk style, detailed..." rows="4"></textarea>
+            <p class="field-hint">This becomes the prompt sent to Pollinations.ai to generate your cover image.</p>
+          </div>
+
+          <div class="section-label" style="margin-top:1.25rem">2. Secret message to hide inside the image</div>
+          <div class="field-group">
+            <textarea id="ai-secret-message" class="textarea" placeholder="Type your secret message here..." rows="3"
+              oninput="updateAiCapacity()"></textarea>
+            <div class="capacity-row">
+              <div class="capacity-bar-wrap">
+                <div class="capacity-bar-fill" id="ai-capacity-fill" style="width:0%"></div>
+              </div>
+              <span class="capacity-label" id="ai-capacity-label">Generate an image first to see capacity</span>
+            </div>
+          </div>
+
+          <div class="section-label" style="margin-top:1.25rem">4. Password (optional)</div>
+          <div class="field-group">
+            <div class="password-field">
+              <input type="password" id="ai-password" class="input" placeholder="Add a password for extra security" />
+              <button class="eye-btn" onclick="togglePassword('ai-password', this)" aria-label="Show/hide password">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.3" />
+                  <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button class="btn-primary btn-ai" id="ai-generate-btn" onclick="aiGenerateAndEncode()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4" />
+              <path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+            </svg>
+            Generate Image &amp; Hide Message
+          </button>
+
+          <div class="status hidden" id="ai-status" role="alert"></div>
+        </div>
+
+        <!-- Right col: preview + download -->
+        <div class="panel-col">
+          <div class="section-label">Generated image preview</div>
+          <div class="ai-preview-box" id="ai-preview-box">
+            <div class="ai-preview-placeholder" id="ai-preview-placeholder">
+              <div class="ai-sparkle">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                  <circle cx="20" cy="20" r="8" stroke="currentColor" stroke-width="1.5" />
+                  <path
+                    d="M20 2v5M20 33v5M2 20h5M33 20h5M6.34 6.34l3.54 3.54M30.12 30.12l3.54 3.54M6.34 33.66l3.54-3.54M30.12 9.88l3.54-3.54"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+              </div>
+              <p class="ai-placeholder-text">Your AI-generated image will appear here</p>
+              <p class="ai-placeholder-sub">Powered by Pollinations.ai — free, no API key needed</p>
+            </div>
+            <img id="ai-generated-preview" class="ai-generated-img hidden" alt="AI generated image" />
+            <div class="ai-loading hidden" id="ai-loading">
+              <div class="ai-spinner"></div>
+              <p id="ai-loading-text">Generating image with AI...</p>
+            </div>
+          </div>
+
+          <div class="ai-action-row hidden" id="ai-action-row">
+            <button class="btn-primary" id="ai-download-btn" onclick="downloadAiEncodedImage()">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+                  stroke-linejoin="round" />
+                <path d="M3 12h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+              Download Encoded PNG
+            </button>
+            <button class="btn-secondary-ai" id="ai-regenerate-btn" onclick="aiRegenerateImage()">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M2 8a6 6 0 0 1 10.5-4M14 8a6 6 0 0 1-10.5 4" stroke="currentColor" stroke-width="1.4"
+                  stroke-linecap="round" />
+                <path d="M12 4l.5-2 1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+              Regenerate Image
+            </button>
+          </div>
+
+          <!-- Info cards -->
+          <div class="ai-info-cards">
+            <div class="ai-info-card">
+              <div class="ai-info-icon">🎨</div>
+              <div>
+                <div class="ai-info-title">AI generates the cover</div>
+                <div class="ai-info-body">Pollinations.ai creates a unique image from your prompt — no original exists
+                  anywhere</div>
+              </div>
+            </div>
+            <div class="ai-info-card">
+              <div class="ai-info-icon">🔒</div>
+              <div>
+                <div class="ai-info-title">Message auto-encoded</div>
+                <div class="ai-info-body">Your secret is XOR-encrypted and embedded via LSB steganography in one click
+                </div>
+              </div>
+            </div>
+            <div class="ai-info-card">
+              <div class="ai-info-icon">🕵️</div>
+              <div>
+                <div class="ai-info-title">Undetectable</div>
+                <div class="ai-info-body">No original to compare against — steganalysis comparison attacks are
+                  impossible</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- SHAMIR'S SECRET SHARING PANEL -->
+    <div class="panel hidden" id="panel-shamirs" role="tabpanel" aria-labelledby="tab-shamirs">
+
+      <!-- Sub-tabs: Split / Reconstruct -->
+      <div class="sss-subtabs">
+        <button class="sss-subtab active" id="sss-subtab-split" onclick="sssSwitchSubtab('split')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M7 1v6M4 4l3-3 3 3M3 8l-2 4h12l-2-4" stroke="currentColor" stroke-width="1.3"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Split Secret
+        </button>
+        <button class="sss-subtab" id="sss-subtab-reconstruct" onclick="sssSwitchSubtab('reconstruct')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M7 13V7M4 10l3 3 3-3M3 6l-2-4h12L11 6" stroke="currentColor" stroke-width="1.3"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Reconstruct Secret
+        </button>
+      </div>
+
+      <!-- SPLIT SUB-PANEL -->
+      <div class="sss-subpanel active" id="sss-panel-split">
+        <div class="sss-info-banner">
+          <div class="sss-info-icon">🔬</div>
+          <div>
+            <strong>Shamir's Secret Sharing</strong> — splits your message into N shares using polynomial interpolation
+            over GF(256). Any K shares reconstruct the secret. Fewer than K shares reveal <em>nothing</em>.
+          </div>
+        </div>
+
+        <div class="panel-grid">
+          <!-- Left: inputs -->
+          <div class="panel-col">
+            <div class="section-label">1. Secret message to split</div>
+            <div class="field-group">
+              <textarea id="sss-message" class="textarea"
+                placeholder="Type the secret message to split across images..." rows="4"></textarea>
+            </div>
+
+            <div class="section-label" style="margin-top:1.25rem">2. AI image style prompt</div>
+            <div class="field-group">
+              <input type="text" id="sss-prompt" class="input"
+                placeholder="e.g. abstract digital art, vibrant colours" />
+              <p class="field-hint">Each share image will be a unique AI-generated variation of this style.</p>
+            </div>
+
+            <div class="section-label" style="margin-top:1.25rem">3. Total shares (N)</div>
+            <div class="sss-slider-row">
+              <input type="range" id="sss-n" min="2" max="8" value="4" class="sss-slider"
+                oninput="sssUpdateN(this.value)" />
+              <span class="sss-slider-val" id="sss-n-val">4</span>
+            </div>
+
+            <div class="section-label" style="margin-top:1rem">4. Threshold (K) — minimum to reconstruct</div>
+            <div class="sss-slider-row">
+              <input type="range" id="sss-k" min="2" max="4" value="3" class="sss-slider"
+                oninput="sssUpdateK(this.value)" />
+              <span class="sss-slider-val" id="sss-k-val">3</span>
+            </div>
+            <p class="field-hint" id="sss-threshold-hint">Any 3 of the 4 images can reconstruct the secret. 1 image(s)
+              can be lost safely.</p>
+
+            <button class="btn-primary btn-sss" id="sss-generate-btn" onclick="sssGenerateShares()"
+              style="margin-top:1.5rem">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 1v6M5 4l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+                  stroke-linejoin="round" />
+                <rect x="1" y="9" width="14" height="6" rx="2" stroke="currentColor" stroke-width="1.4" />
+              </svg>
+              Generate Shares &amp; Hide in Images
+            </button>
+
+            <div class="sss-loading-info hidden" id="sss-loading-info">Splitting secret...</div>
+            <div class="status hidden" id="sss-split-status" role="alert"></div>
+          </div>
+
+          <!-- Right: math explainer -->
+          <div class="panel-col">
+            <div class="sss-math-box">
+              <div class="sss-math-title">How the math works</div>
+              <div class="sss-math-step">
+                <div class="sss-math-num">①</div>
+                <div>For each byte of your message, build a random polynomial of degree K-1 where the <strong>constant
+                    term = the secret byte</strong></div>
+              </div>
+              <div class="sss-math-formula">f(x) = secret + a₁x + a₂x² + ... + a₍ₖ₋₁₎x^(k-1)</div>
+              <div class="sss-math-step">
+                <div class="sss-math-num">②</div>
+                <div>Evaluate the polynomial at x=1, 2, ..., N to get N share values</div>
+              </div>
+              <div class="sss-math-formula">Share i = (i, f(i))</div>
+              <div class="sss-math-step">
+                <div class="sss-math-num">③</div>
+                <div>All arithmetic is done in <strong>GF(256)</strong> — the same finite field used in AES encryption
+                </div>
+              </div>
+              <div class="sss-math-step">
+                <div class="sss-math-num">④</div>
+                <div>Each share is LSB-encoded into a unique AI-generated image</div>
+              </div>
+              <div class="sss-math-divider"></div>
+              <div class="sss-math-step">
+                <div class="sss-math-num">★</div>
+                <div><strong>Security guarantee:</strong> Any K-1 or fewer shares give <em>zero information</em> about
+                  the secret — proven by information theory</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generated images grid -->
+        <div class="sss-images-section hidden" id="sss-images-section">
+          <div class="sss-images-header">
+            <div class="section-label" style="margin:0">Generated share images</div>
+            <button class="btn-secondary-ai" onclick="downloadAllShares()">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 1v7M4.5 6l2.5 2.5L9.5 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"
+                  stroke-linejoin="round" />
+                <path d="M2 12h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+              </svg>
+              Download All
+            </button>
+          </div>
+          <div class="sss-images-grid" id="sss-images-grid"></div>
+        </div>
+      </div>
+
+      <!-- RECONSTRUCT SUB-PANEL -->
+      <div class="sss-subpanel hidden" id="sss-panel-reconstruct">
+        <div class="sss-info-banner">
+          <div class="sss-info-icon">🔓</div>
+          <div>
+            Upload <strong>any K or more</strong> of the share images. The system will extract each share using LSB
+            decode, then use <strong>Lagrange interpolation</strong> to reconstruct the original secret.
+          </div>
+        </div>
+
+        <div class="panel-grid">
+          <div class="panel-col">
+            <div class="section-label">Upload share images (at least K)</div>
+            <div class="upload-zone sss-upload-zone" onclick="document.getElementById('sss-upload-input').click()"
+              ondragover="handleDragOver(event)" ondrop="sssDrop(event)">
+              <div class="upload-content">
+                <div class="upload-icon">
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <circle cx="8" cy="16" r="4" stroke="currentColor" stroke-width="1.5" />
+                    <circle cx="24" cy="8" r="4" stroke="currentColor" stroke-width="1.5" />
+                    <circle cx="24" cy="24" r="4" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M12 14.5l8-5M12 17.5l8 5" stroke="currentColor" stroke-width="1.5"
+                      stroke-linecap="round" />
+                  </svg>
+                </div>
+                <div class="upload-text">Drop share images here or click to browse</div>
+                <div class="upload-hint">Select multiple files at once — any K or more shares</div>
+              </div>
+            </div>
+            <input type="file" id="sss-upload-input" accept="image/png" multiple hidden
+              onchange="sssHandleUpload(event)" />
+
+            <div class="sss-uploaded-list" id="sss-uploaded-list"></div>
+
+            <button class="btn-primary btn-sss" id="sss-reconstruct-btn" onclick="sssReconstruct()" disabled
+              style="margin-top:1rem">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 15V9M5 12l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+                  stroke-linejoin="round" />
+                <rect x="1" y="1" width="14" height="6" rx="2" stroke="currentColor" stroke-width="1.4" />
+              </svg>
+              Reconstruct Secret
+            </button>
+
+            <div class="status hidden" id="sss-reconstruct-status" role="alert"></div>
+
+            <div class="result-box hidden" id="sss-result-box">
+              <div class="result-header">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M7 1l1.5 3 3.5.5-2.5 2.5.5 3.5L7 9l-3 1.5.5-3.5L2 4.5 5.5 4z" stroke="currentColor"
+                    stroke-width="1.2" stroke-linejoin="round" />
+                </svg>
+                Reconstructed secret
+              </div>
+              <div class="result-text" id="sss-result-text"></div>
+              <button class="copy-btn" id="sss-copy-btn" onclick="sssCopyResult()">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                  <rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2" />
+                  <path d="M4 9H2.5A1.5 1.5 0 0 1 1 7.5V2.5A1.5 1.5 0 0 1 2.5 1h5A1.5 1.5 0 0 1 9 2.5V4"
+                    stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                </svg>
+                Copy secret
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Lagrange explainer -->
+          <div class="panel-col">
+            <div class="sss-math-box">
+              <div class="sss-math-title">Lagrange Interpolation</div>
+              <div class="sss-math-step">
+                <div class="sss-math-num">①</div>
+                <div>Given K points (x₁,y₁), ..., (xₖ,yₖ) from K share images</div>
+              </div>
+              <div class="sss-math-step">
+                <div class="sss-math-num">②</div>
+                <div>Reconstruct f(0) — the original secret byte — using:</div>
+              </div>
+              <div class="sss-math-formula">f(0) = Σ yᵢ · Π (xⱼ / (xᵢ ⊕ xⱼ))</div>
+              <div class="sss-math-step">
+                <div class="sss-math-num">③</div>
+                <div>All operations (×, ÷, +) are done in <strong>GF(256)</strong> — division uses Fermat's little
+                  theorem: a⁻¹ = a²⁵⁴</div>
+              </div>
+              <div class="sss-math-step">
+                <div class="sss-math-num">④</div>
+                <div>Repeat for every byte of the message to recover the full secret</div>
+              </div>
+              <div class="sss-math-divider"></div>
+              <div class="sss-math-step">
+                <div class="sss-math-num">★</div>
+                <div><strong>K-1 shares = zero info:</strong> for any possible secret value, there exists a valid
+                  polynomial passing through K-1 points — making them cryptographically useless alone</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <section class="how-section">
+      <h2 class="how-title">How it works</h2>
+      <div class="how-grid">
+        <div class="how-card">
+          <div class="how-num">01</div>
+          <div class="how-head">LSB steganography</div>
+          <p class="how-body">The last bit of each pixel's Red, Green, and Blue channel is replaced with one bit of your
+            message. The change is invisible — human eyes can't detect a 1-bit difference in color.</p>
+        </div>
+        <div class="how-card">
+          <div class="how-num">02</div>
+          <div class="how-head">XOR encryption</div>
+          <p class="how-body">If you set a password, the message is XOR-ciphered against it before embedding. Without
+            the exact password, the decoded output will be garbled gibberish.</p>
+        </div>
+        <div class="how-card">
+          <div class="how-num">03</div>
+          <div class="how-head">PNG output only</div>
+          <p class="how-body">Always download as PNG. JPEG compression re-encodes pixels and destroys the hidden bits.
+            PNG is lossless — every pixel value is preserved exactly.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Hidden canvases for pixel manipulation -->
+  <canvas id="encode-canvas" hidden></canvas>
+  <canvas id="decode-canvas" hidden></canvas>
+  <canvas id="ai-canvas" hidden></canvas>
+
+  <!-- JS Modules -->
+  <script src="js/utils.js"></script>
+  <script src="js/crypto.js"></script>
+  <script src="js/steganography.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/shamirs.js"></script>
+  <script src="js/shamirsui.js"></script>
+  <script src="js/aigenerate.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+
+</html>

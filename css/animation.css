@@ -1,0 +1,155 @@
+/* ============================================
+   StegoAI — animations.css
+   All keyframes and transition effects
+   ============================================ */
+
+/* ---- Fade In (panel switch) ---- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Slide Up (status messages, result box) ---- */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Scale In (image preview loads) ---- */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ---- Pulse (capacity bar warning) ---- */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+/* ---- Spin (loading indicator) ---- */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Shimmer (drag-over highlight) ---- */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* ---- Apply animations ---- */
+
+.status:not(.hidden) {
+  animation: slideUp 0.22s ease;
+}
+
+.result-box:not(.hidden) {
+  animation: slideUp 0.25s ease;
+}
+
+.upload-preview:not(.hidden) {
+  animation: scaleIn 0.3s ease;
+}
+
+.panel.active {
+  animation: fadeIn 0.2s ease;
+}
+
+/* Capacity bar danger pulse */
+.capacity-bar-fill.danger {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+/* Loading spinner on button */
+.btn-primary.loading svg {
+  animation: spin 0.8s linear infinite;
+}
+
+/* Drag-over shimmer on upload zone */
+.upload-zone.drag-over::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(124,106,247,0.08) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Copy button success flash */
+@keyframes copyFlash {
+  0%   { color: var(--green); border-color: var(--green); }
+  80%  { color: var(--green); border-color: var(--green); }
+  100% { color: var(--text2); border-color: var(--border2); }
+}
+
+.copy-btn.copied {
+  animation: copyFlash 1.4s ease forwards;
+}
+
+/* How-cards hover lift */
+.how-card {
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.how-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(124,106,247,0.25);
+}
+
+/* Tab transition */
+.tab {
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+/* Button hover glow */
+.btn-primary {
+  transition: background 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  box-shadow: 0 4px 20px rgba(124,106,247,0.3);
+}
+
+/* Input focus ring */
+.textarea, .input {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.textarea:focus, .input:focus {
+  box-shadow: 0 0 0 3px rgba(124,106,247,0.15);
+}
+
+/* ---- AI Generate tab ---- */
+@keyframes aiSparkle {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.08); }
+}
+
+.ai-sparkle {
+  animation: aiSparkle 2s ease-in-out infinite;
+}
+
+.ai-preview-box {
+  transition: border-color 0.3s ease;
+}
+
+.ai-generated-img {
+  animation: scaleIn 0.4s ease;
+}
+
+.ai-info-card {
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.ai-info-card:hover {
+  border-color: rgba(124,106,247,0.25);
+  transform: translateX(3px);
+}
